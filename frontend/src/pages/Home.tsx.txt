@@ -1,0 +1,139 @@
+import React from 'react';
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  Typography,
+  Card,
+  CardContent,
+} from '@mui/material';
+import { Link } from 'react-router-dom';
+import {
+  Restaurant,
+  Favorite,
+  Timeline,
+  LocalShipping,
+} from '@mui/icons-material';
+
+const features = [
+  {
+    icon: <Restaurant sx={{ fontSize: 40 }} />,
+    title: 'List Surplus Food',
+    description: 'Restaurants and stores can easily list their surplus food items.',
+  },
+  {
+    icon: <Favorite sx={{ fontSize: 40 }} />,
+    title: 'Help Communities',
+    description: 'Connect with local charities and make a difference in your community.',
+  },
+  {
+    icon: <Timeline sx={{ fontSize: 40 }} />,
+    title: 'Track Impact',
+    description: 'Monitor your contribution to reducing food waste and helping others.',
+  },
+  {
+    icon: <LocalShipping sx={{ fontSize: 40 }} />,
+    title: 'Efficient Distribution',
+    description: 'Coordinate pickup and delivery to ensure food reaches those in need.',
+  },
+];
+
+const Home = () => {
+  return (
+    <Box>
+      {/* Hero Section */}
+      <Box
+        sx={{
+          bgcolor: 'primary.main',
+          color: 'white',
+          py: 8,
+          mb: 6,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Typography variant="h2" component="h1" gutterBottom>
+                Reduce Food Waste, Feed Communities
+              </Typography>
+              <Typography variant="h5" paragraph>
+                Connect surplus food with those who need it most through our
+                intelligent platform.
+              </Typography>
+              <Box sx={{ mt: 4 }}>
+                <Button
+                  component={Link}
+                  to="/register"
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  sx={{ mr: 2 }}
+                >
+                  Get Started
+                </Button>
+                <Button
+                  component={Link}
+                  to="/about"
+                  variant="outlined"
+                  color="inherit"
+                  size="large"
+                >
+                  Learn More
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* Features Section */}
+      <Container maxWidth="lg" sx={{ mb: 8 }}>
+        <Typography
+          variant="h3"
+          component="h2"
+          align="center"
+          gutterBottom
+          sx={{ mb: 6 }}
+        >
+          How It Works
+        </Typography>
+        <Grid container spacing={4}>
+          {features.map((feature, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Card
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  p: 2,
+                }}
+              >
+                <Box
+                  sx={{
+                    p: 2,
+                    color: 'primary.main',
+                  }}
+                >
+                  {feature.icon}
+                </Box>
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="h3">
+                    {feature.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {feature.description}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </Box>
+  );
+};
+
+export default Home; 

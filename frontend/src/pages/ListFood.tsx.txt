@@ -1,0 +1,171 @@
+import React, { useState } from 'react';
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
+interface FoodListing {
+  title: string;
+  description: string;
+  quantity: string;
+  unit: string;
+  expiryDate: string;
+  pickupInstructions: string;
+  category: string;
+  status: string;
+}
+
+const ListFood = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<FoodListing>({
+    title: '',
+    description: '',
+    quantity: '',
+    unit: '',
+    expiryDate: '',
+    pickupInstructions: '',
+    category: '',
+    status: 'available',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSelectChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Add API call to create food listing
+    console.log('Food listing data:', formData);
+    // Redirect to dashboard after successful creation
+    navigate('/dashboard');
+  };
+
+  return (
+    <Container maxWidth="md">
+      <Box sx={{ mt: 4, mb: 4 }}>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Typography variant="h4" gutterBottom>
+            List Available Food
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  label="Title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  multiline
+                  rows={4}
+                  label="Description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  label="Quantity"
+                  name="quantity"
+                  type="number"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth required>
+                  <InputLabel>Unit</InputLabel>
+                  <Select
+                    name="unit"
+                    value={formData.unit}
+                    label="Unit"
+                    onChange={handleSelectChange}
+                  >
+                    <MenuItem value="kg">Kilograms (kg)</MenuItem>
+                    <MenuItem value="lbs">Pounds (lbs)</MenuItem>
+                    <MenuItem value="items">Items</MenuItem>
+                    <MenuItem value="servings">Servings</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  label="Expiry Date"
+                  name="expiryDate"
+                  type="date"
+                  value={formData.expiryDate}
+                  onChange={handleChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth required>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    name="category"
+                    value={formData.category}
+                    label="Category"
+                    onChange={handleSelectChange}
+                  >
+                    <MenuItem value="produce">Produce</MenuItem>
+                    <MenuItem value="dairy">Dairy</MenuItem>
+                    <MenuItem value="bakery">Bakery</MenuItem>
+                    <MenuItem value="meat">Meat</MenuItem>
+                    <MenuItem value="pantry">Pantry</MenuItem>
+                    <MenuItem value="prepared">Prepared Food</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  multiline
+                  rows={3}
+                  label="Pickup Instructions"
+                  name="pickupInstructions"
+                  value={formData.pickupInstructions}
+                  onChange={handleChange}
+                />
+              </Grid>
+            </Grid>
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
+              <Button
+                variant="outlined"
+                onClick={() => navigate('/dashboard')}

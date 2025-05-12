@@ -1,0 +1,153 @@
+import React, { useState } from 'react';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Box,
+  Menu,
+  MenuItem,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material';
+import {
+  Menu as MenuIcon,
+  Restaurant as RestaurantIcon,
+} from '@mui/icons-material';
+import { Link, useNavigate } from 'react-router-dom';
+
+const Navbar = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
+  const isAuthenticated = false; // Replace with actual auth state
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    handleClose();
+  };
+
+  return (
+    <AppBar position="static">
+      <Toolbar>
+        <RestaurantIcon sx={{ mr: 2 }} />
+        <Typography
+          variant="h6"
+          component={Link}
+          to="/"
+          sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
+        >
+          PlateShare
+        </Typography>
+
+        {isMobile ? (
+          <>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={handleMenu}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={() => handleNavigate('/find-food')}>
+                Find Food
+              </MenuItem>
+              <MenuItem onClick={() => handleNavigate('/list-food')}>
+                List Food
+              </MenuItem>
+              {!isAuthenticated ? (
+                <>
+                  <MenuItem onClick={() => handleNavigate('/login')}>
+                    Login
+                  </MenuItem>
+                  <MenuItem onClick={() => handleNavigate('/register')}>
+                    Register
+                  </MenuItem>
+                </>
+              ) : (
+                <>
+                  <MenuItem onClick={() => handleNavigate('/dashboard')}>
+                    Dashboard
+                  </MenuItem>
+                  <MenuItem onClick={() => handleNavigate('/logout')}>
+                    Logout
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+          </>
+        ) : (
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/find-food"
+            >
+              Find Food
+            </Button>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/list-food"
+            >
+              List Food
+            </Button>
+            {!isAuthenticated ? (
+              <>
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to="/login"
+                >
+                  Login
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  component={Link}
+                  to="/register"
+                >
+                  Register
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to="/dashboard"
+                >
+                  Dashboard
+                </Button>
+                <Button
+                  color="inherit"
+                  onClick={() => handleNavigate('/logout')}
+                >
+                  Logout
+                </Button>
+              </>
+            )}
+          </Box>
+        )}
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+export default Navbar; 

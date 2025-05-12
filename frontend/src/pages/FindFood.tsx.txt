@@ -1,0 +1,176 @@
+mport React, { useState, ChangeEvent, FormEvent } from 'react';
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  Chip,
+  SelectChangeEvent,
+} from '@mui/material';
+import { Search as SearchIcon } from '@mui/icons-material';
+
+interface FoodListing {
+  id: string;
+  title: string;
+  description: string;
+  quantity: string;
+  unit: string;
+  expiryDate: string;
+  category: string;
+  location: string;
+  postedBy: string;
+}
+
+const FindFood: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [category, setCategory] = useState('');
+  const [listings, setListings] = useState<FoodListing[]>([
+    {
+      id: '1',
+      title: 'Fresh Organic Vegetables',
+      description: 'Assorted organic vegetables from my garden',
+      quantity: '5',
+      unit: 'kg',
+      expiryDate: '2024-04-10',
+      category: 'produce',
+      location: 'Downtown',
+      postedBy: 'John Doe'
+    },
+    {
+      id: '2',
+      title: 'Homemade Bread',
+      description: 'Freshly baked sourdough bread',
+      quantity: '2',
+      unit: 'items',
+      expiryDate: '2024-04-05',
+      category: 'bakery',
+      location: 'Westside',
+      postedBy: 'Jane Smith'
+    }
+  ]);
+
+  const handleSearch = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Add API call to search food listings
+    console.log('Searching with:', { searchTerm, category });
+  };
+
+  const handleRequest = (listingId: string) => {
+    // Add API call to request food item
+    console.log('Requesting item:', listingId);
+  };
+
+  return (
+    <Container maxWidth="lg">
+      <Box sx={{ mt: 4, mb: 4 }}>
+        <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
+          <Typography variant="h4" gutterBottom>
+            Find Available Food
+          </Typography>
+          <form onSubmit={handleSearch}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Search food listings"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by title, description, or location"
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    value={category}
+                    label="Category"
+                    onChange={(e) => setCategory(e.target.value)}
+                  >
+                    <MenuItem value="">All Categories</MenuItem>
+                    <MenuItem value="produce">Produce</MenuItem>
+                    <MenuItem value="dairy">Dairy</MenuItem>
+                    <MenuItem value="bakery">Bakery</MenuItem>
+                    <MenuItem value="meat">Meat</MenuItem>
+                    <MenuItem value="pantry">Pantry</MenuItem>
+                    <MenuItem value="prepared">Prepared Food</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  type="submit"
+                  sx={{ height: '100%' }}
+                  startIcon={<SearchIcon />}
+                >
+                  Search
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </Paper>
+
+        <Grid container spacing={3}>
+          {listings.map((listing) => (
+            <Grid item xs={12} md={6} key={listing.id}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    {listing.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    {listing.description}
+                  </Typography>
+                  <Box sx={{ mb: 2 }}>
+                    <Chip
+                      label={`${listing.quantity} ${listing.unit}`}
+                      size="small"
+                      sx={{ mr: 1 }}
+                    />
+                    <Chip
+                      label={listing.category}
+                      size="small"
+                      sx={{ mr: 1 }}
+                    />
+                    <Chip
+                      label={`Expires: ${listing.expiryDate}`}
+                      size="small"
+                    />
+                  </Box>
+                  <Typography variant="body2">
+                    Location: {listing.location}
+                  </Typography>
+                  <Typography variant="body2">
+                    Posted by: {listing.postedBy}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={() => handleRequest(listing.id)}
+                  >
+                    Request Item
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Container>
+  );
+};
+
+export default FindFood; 
