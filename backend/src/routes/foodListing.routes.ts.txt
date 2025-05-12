@@ -1,0 +1,56 @@
+import express from 'express';
+import { protect, authorize } from '../middleware/auth';
+import {
+  createFoodListing,
+  getFoodListings,
+  getFoodListing,
+  updateFoodListing,
+  deleteFoodListing,
+  reserveFoodListing,
+  completeFoodListing,
+  getNearbyFoodListings,
+} from '../controllers/foodListing.controller';
+
+const router = express.Router();
+
+// Protected routes - all users must be authenticated
+router.use(protect);
+
+// Provider routes
+router.post(
+  '/',
+  authorize('provider'),
+  createFoodListing
+);
+
+router.put(
+  '/:id',
+  authorize('provider'),
+  updateFoodListing
+);
+
+router.delete(
+  '/:id',
+  authorize('provider'),
+  deleteFoodListing
+);
+
+// Recipient routes
+router.post(
+  '/:id/reserve',
+  authorize('recipient'),
+  reserveFoodListing
+);
+
+router.post(
+  '/:id/complete',
+  authorize('recipient'),
+  completeFoodListing
+);
+
+// Common routes
+router.get('/', getFoodListings);
+router.get('/nearby', getNearbyFoodListings);
+router.get('/:id', getFoodListing);
+
+export const foodListingRouter = router; 

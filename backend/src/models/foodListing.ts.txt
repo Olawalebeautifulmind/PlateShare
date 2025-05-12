@@ -1,0 +1,173 @@
+import { Schema, model, Document, Types } from 'mongoose';
+
+export interface IFoodListing extends Document {
+  provider: Types.ObjectId;
+  title: string;
+  description: string;
+  quantity: number;
+  unit: string;
+  category: string;
+  dietary: string[];
+  expiryDate: Date;
+  pickupWindow: {
+    start: Date;
+    end: Date;
+  };
+  pickupAddress: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+    coordinates?: {
+      latitude: number;
+      longitude: number;
+    };
+  };
+  status: 'available' | 'reserved' | 'completed' | 'expired';
+  temperature: 'frozen' | 'refrigerated' | 'room-temperature';
+  allergens: string[];
+  images: string[];
+  recipient?: Types.ObjectId;
+  reservedAt?: Date;
+  completedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const foodListingSchema = new Schema<IFoodListing>(
+  {
+    provider: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+    unit: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    category: {
+      type: String,
+      required: true,
+      enum: [
+        'prepared-meals',
+        'produce',
+        'dairy',
+        'bakery',
+        'meat',
+        'seafood',
+        'pantry',
+        'other',
+      ],
+    },
+    dietary: {
+      type: [String],
+      enum: [
+        'vegetarian',
+        'vegan',
+        'halal',
+        'kosher',
+        'gluten-free',
+        'dairy-free',
+        'nut-free',
+      ],
+    },
+    expiryDate: {
+      type: Date,
+      required: true,
+    },
+    pickupWindow: {
+      start: {
+        type: Date,
+        required: true,
+      },
+      end: {
+        type: Date,
+        required: true,
+      },
+    },
+    pickupAddress: {
+      street: {
+        type: String,
+        required: true,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      state: {
+        type: String,
+        required: true,
+      },
+      zipCode: {
+        type: String,
+        required: true,
+      },
+      country: {
+        type: String,
+        required: true,
+      },
+      coordinates: {
+        latitude: Number,
+        longitude: Number,
+      },
+    },
+    status: {
+      type: String,
+      enum: ['available', 'reserved', 'completed', 'expired'],
+      default: 'available',
+    },
+    temperature: {
+      type: String,
+      enum: ['frozen', 'refrigerated', 'room-temperature'],
+      required: true,
+    },
+    allergens: {
+      type: [String],
+      default: [],
+    },
+    images: {
+      type: [String],
+      default: [],
+    },
+    recipient: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    reservedAt: Date,
+    completedAt: Date,
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Index for geospatial queries
+foodListingSchema.index({
+  'pickupAddress.coordinates': '2dsphere',
+});
+
+// Index for searching available food listings
+foodListingSchema.index({
+  status: 1,
+  expiryDate: 1,
+  'pickupWindow.start': 1,
+});
+
+export const FoodListing = model<IFoodListing>('FoodListing', foodListingSchema); 

@@ -1,0 +1,55 @@
+import { Request, Response, NextFunction } from 'express';
+
+interface CustomError extends Error {
+  statusCode?: number;
+  errors?: any[];
+}
+
+export const errorHandler = (
+  err: CustomError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.error(err);
+
+  // MongoDB duplicate key error
+  if (err.name === 'MongoServerError' && (err as any).code === 11000) {
+    return res.status(400).json({
+      success: false,
+      error: 'Duplicate value entered',
+    });
+  }
+
+  // Mongoose validation error
+  if (err.name === 'ValidationError') {
+    const messages = Object.values((err as any).errors).map(
+      (val: any) => val.message
+    );
+    return res.status(400).json({
+      success: false,
+      error: messages,
+    });
+  }
+
+  // JWT errors
+  if (err.name === 'JsonWebTokenError') {
+    return res.status(401).json({
+      success: false,
+      error: 'Invalid token',
+    });
+  }
+
+  if (err.name === 'TokenExpiredError') {
+    return res.status(401).json({
+      success: false,
+      error: 'Token expired',
+    });
+  }
+
+  // Default error
+  res.status(err.statusCode || 500).json({
+    success: false,
+    error: err.message || 'Server Error',
+  });
+}; 

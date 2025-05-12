@@ -1,0 +1,181 @@
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { User, IUser } from '../models/User';
+
+interface AuthRequest extends Request {
+  user?: IUser;
+}
+
+const generateToken = (id: string): string => {
+  return jwt.sign({ id }, process.env.JWT_SECRET || 'your-jwt-secret', {
+    expiresIn: '30d',
+  });
+};
+
+export const register = async (req: Request, res: Response) => {
+  try {
+    const { email, password, name, organization, role, address, phone } = req.body;
+
+    const userExists = await User.findOne({ email });
+
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        error: 'User already exists',
+      });
+    }
+
+    const user = await User.create({
+      email,
+      password,
+      name,
+      organization,
+      role,
+      address,
+      phone,
+    });
+
+    const token = generateToken(user._id);
+
+    res.status(201).json({
+      success: true,
+      data: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        organization: user.organization,
+        role: user.role,
+        token,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: 'Invalid user data',
+    });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials',
+      });
+    }
+
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials',
+      });
+    }
+
+    const token = generateToken(user._id);
+
+    res.json({
+      success: true,
+      data: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        organization: user.organization,
+        role: user.role,
+        token,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Server error',
+    });
+  }
+};
+
+export const getProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await User.findById(req.user?._id).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Server error',
+    });
+  }
+};
+
+export const updateProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const { name, organization, address, phone } = req.body;
+
+    const user = await User.findById(req.user?._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found',
+      });
+    }
+
+    user.name = name || user.name;
+    user.organization = organization || user.organization;
+    user.address = address || user.address;
+    user.phone = phone || user.phone;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: 'Invalid user data',
+    });
+  }
+};
+
+export const verifyUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await User.findById(req.params.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found',
+      });
+    }
+
+    user.verified = true;
+    await user.save();
+
+    res.json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Server error',
+    });
+  }
+}; 
